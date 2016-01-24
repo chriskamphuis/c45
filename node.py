@@ -43,7 +43,12 @@ class Node:
                 i += 1
             X = Xtemp
             y = ytemp
-            self.toSplit = bestAttribute
+            if bestGain >0:
+                print "split on attribute {0}, at a value of {1}, with a gain of {2}".format(bestAttribute,X[bestIndex][bestAttribute],bestGain)            
+                self.toSplit = bestAttribute
+            elif bestGain is 0:
+                print "No split had to be made"
+            
             if isinstance(X[0][self.toSplit], float):
                 self.splitValue = X[bestIndex][self.toSplit]
                 childLeft = Node(X[bestIndex:], y[bestIndex:],
@@ -60,7 +65,7 @@ class Node:
 
     """
     This function looks which class is most present in the trainingsdata, if
-    their are less then minsplit attributes but there are more then 0
+    there are less than minsplit attributes but there are more then 0
     attributes this will become the leaf label. Its value is also saved
     otherwise because it should be given to the child node if this one has no
     values.
