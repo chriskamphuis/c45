@@ -7,7 +7,7 @@ class Node:
     This class represents the nodes of the tree. These nodes can either be
     leafes or have childs. Complexity: O(a*N^2log(N)) or O(a*N^3*log(N))
     """
-    def __init__(self, X, y, nodeID, mostPresentClassParent="", minsplit=100):
+    def __init__(self, X, y, nodeID, mostPresentClassParent="", minsplit=20):
         if(len(X) != len(y)):
             raise("unequal length attributes + classes")
         self.classify = ""
@@ -109,8 +109,8 @@ class Node:
             currentBestIndex = None
             currentBestGain = 0
             for i in range(len(coupled)): #O(len(coupled)*len(y)) => O(N^2)
-                gain = information - self.information(targets[:i])
-                gain = gain - self.information(targets[i:])
+                gain = information - self.information(targets[:i])*float(i)/float(len(y))
+                gain = gain - self.information(targets[i:])*float(len(y)-i)/float(len(y))
                 if gain > currentBestGain:
                     currentBestGain = gain
                     currentBestIndex = i
@@ -127,7 +127,7 @@ class Node:
                 counter[e] += 1
             except KeyError:
                 counter[e] = 1
-        counts = [float(value) for value in counter.values()] #O(len(y))
+        counts = [float(value) for value in counter.values()]
         info = 0.0
         for e in counts:
             info += float((-e/n)) * math.log(e/n, 2)
