@@ -7,7 +7,7 @@ class Node:
     This class represents the nodes of the tree. These nodes can either be
     leafes or have childs.
     """
-    def __init__(self, X, y, mostPresentClassParent="", minsplit=4):
+    def __init__(self, X, y, nodeID, mostPresentClassParent="", minsplit=100):
         if(len(X) != len(y)):
             raise("unequal length attributes + classes")
         self.classify = ""
@@ -44,24 +44,24 @@ class Node:
             X = Xtemp
             y = ytemp
             if bestGain >0:
-                print "split on attribute {0}, at a value of {1}, with a gain of {2}".format(bestAttribute,X[bestIndex][bestAttribute],bestGain)            
+                print "Node {3} split on attribute {0}, at a value of {1}, with a gain of {2} .".format(bestAttribute,X[bestIndex][bestAttribute],bestGain, nodeID)            
                 self.toSplit = bestAttribute
             elif bestGain is 0:
                 print "No split had to be made"
             
             if isinstance(X[0][self.toSplit], float):
                 self.splitValue = X[bestIndex][self.toSplit]
-                childLeft = Node(X[bestIndex:], y[bestIndex:],
+                childLeft = Node(X[bestIndex:], y[bestIndex:],nodeID+'l',
                                  self.mostPresentClass, minsplit=minsplit)
-                childRight = Node(X[:bestIndex], y[:bestIndex],
+                childRight = Node(X[:bestIndex], y[:bestIndex],nodeID+'r',
                                   self.mostPresentClass, minsplit=minsplit)
                 self.childeren = [childLeft, childRight]
-            else:
+            elif isinstance(X[0][self.toSplit], str):
                 splits = list(set(X.T[self.toSplit]))
                 for e in splits:
                     indices = [i for i, j in enumerate(X.T[self.toSplit]) if j == e]
-                    self.childeren.append(Node(X[indices], y[indices]), self.mostPresentClass)
-                self.classify = self.mostPresentClass
+                    self.childeren.append(Node(X[indices], y[indices]),"n", self.mostPresentClass)
+            self.classify = self.mostPresentClass
 
     """
     This function looks which class is most present in the trainingsdata, if
