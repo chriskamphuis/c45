@@ -37,8 +37,9 @@ class Node:
                     bestGain = gain
                     bestIndex = index
                     bestAttribute = i
-                    Xtemp = X[indices]
-                    ytemp = y[indices]
+                    if indices is not None:
+                        Xtemp = X[indices]
+                        ytemp = y[indices]
                 i += 1
             X = Xtemp
             y = ytemp
@@ -46,11 +47,15 @@ class Node:
             if isinstance(X[0][self.toSplit], float):
                 self.splitValue = X[bestIndex][self.toSplit]
                 childLeft = Node(X[bestIndex:], y[bestIndex:],
-                                 self.mostPresentClass)
+                                 self.mostPresentClass, minsplit=minsplit)
                 childRight = Node(X[:bestIndex], y[:bestIndex],
-                                  self.mostPresentClass)
+                                  self.mostPresentClass, minsplit=minsplit)
                 self.childeren = [childLeft, childRight]
             else:
+                splits = list(set(X.T[self.toSplit]))
+                for e in splits:
+                    indices = [i for i, j in enumerate(X.T[self.toSplit]) if j == e]
+                    self.childeren.append(Node(X[indices], y[indices]), self.mostPresentClass)
                 self.classify = self.mostPresentClass
 
     """
@@ -82,7 +87,14 @@ class Node:
     """
     def getGain(self, X, y, information):
         if isinstance(X[0], str):  # Return gain value and empty sting
-            return 0, ""
+            coupled = np.array([list(X), list(y)]).T
+            indices = np.argsort(X)
+            coupled = coupled[indices]
+            possibleValues = list(set(X))
+            gain = information
+            for i in range(len(possibleValues)):
+                gain -= self.information([y for [x, y] in coupled if x is i])
+            return gain, None, None
         else:  # if numeric return gain and split point (str)
             coupled = np.array([list(X), list(y)]).T
             indices = np.argsort(X)
@@ -120,3 +132,8 @@ class Node:
                 return self.childeren[0].classifyfunction(x)
             else:
                 return self.childeren[1].classifyfunction(x)
+        else:
+            value = x[self.toSplit]
+            for child in self.childeren:
+                if child.X[0][self.toSplit] == value:
+                    return child.classifyfunction(x)

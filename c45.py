@@ -1,5 +1,6 @@
 from sklearn import datasets
 from node import Node
+import numpy as np
 
 
 class C45:
